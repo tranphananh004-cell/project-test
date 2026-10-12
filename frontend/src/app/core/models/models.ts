@@ -104,3 +104,12 @@ export interface CurrentUser {
   email?: string;
   authorities: string[];
 }
+
+export interface ErrorResponse {
+  code: number;
+  status: number;
+  error: string;
+  message: string;
+  timestamp: string;
+  fieldErrors?: Record<string, string>;
+}
