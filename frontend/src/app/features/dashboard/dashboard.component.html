@@ -1,0 +1,117 @@
+<div class="flex flex-col gap-6 w-full">
+  <!-- Welcome Hero Banner -->
+  <div class="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="max-w-xl">
+      
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight mb-1.5">
+        Xin chào, {{ authService.currentUserSignal()?.username }} 
+      </h1>
+      
+    </div>
+
+    
+  </div>
+
+  <!-- Stats Grid (Harmonious Pastel Color Palette) -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Stat 1: Users (Pastel Sky Blue) -->
+    <div class="p-5 rounded-2xl bg-sky-50 border border-sky-100 shadow-xs flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-sky-800">Tổng người dùng</span>
+        <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-sky-950">{{ userCount }}</div>
+        <div class="text-[11px] text-sky-700/80 mt-1">Tài khoản trong hệ thống</div>
+      </div>
+    </div>
+
+    <!-- Stat 2: Roles (Pastel Soft Pink) -->
+    <div class="p-5 rounded-2xl bg-pink-50 border border-pink-100 shadow-xs flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-pink-800">Tổng vai trò (Roles)</span>
+        <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-pink-950">{{ roleCount }}</div>
+        <div class="text-[11px] text-pink-700/80 mt-1">Nhóm vai trò được gán</div>
+      </div>
+    </div>
+
+    <!-- Stat 3: Permissions (Pastel Lavender) -->
+    <div class="p-5 rounded-2xl bg-purple-50 border border-purple-100 shadow-xs flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-purple-800">Tổng quyền (Permissions)</span>
+        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-key"></i>
+        </div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-purple-950">{{ permissionCount }}</div>
+        <div class="text-[11px] text-purple-700/80 mt-1">Phạm vi bảo vệ API</div>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <!-- Quick Action Shortcuts -->
+  <div>
+    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+      Thao tác nhanh
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      @if (authService.hasPermission('USER_READ')) {
+        <a routerLink="/users" class="p-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/80 shadow-xs transition flex items-start gap-3.5 group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-sm flex-shrink-0 group-hover:scale-105 transition">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-slate-800 text-xs flex items-center justify-between group-hover:text-sky-600 transition">
+              <span>Quản lý User</span>
+              <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition text-[10px]"></i>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Danh sách người dùng, gán Role, đổi mật khẩu.</div>
+          </div>
+        </a>
+      }
+
+      @if (authService.hasPermission('ROLE_READ')) {
+        <a routerLink="/roles" class="p-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/80 shadow-xs transition flex items-start gap-3.5 group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm flex-shrink-0 group-hover:scale-105 transition">
+            <i class="fa-solid fa-sitemap"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-slate-800 text-xs flex items-center justify-between group-hover:text-purple-600 transition">
+              <span>Cấu hình Roles</span>
+              <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition text-[10px]"></i>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Định nghĩa vai trò và gán quyền hạn.</div>
+          </div>
+        </a>
+      }
+
+      @if (authService.hasPermission('PERMISSION_READ')) {
+        <a routerLink="/permissions" class="p-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/80 shadow-xs transition flex items-start gap-3.5 group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-sm flex-shrink-0 group-hover:scale-105 transition">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-slate-800 text-xs flex items-center justify-between group-hover:text-pink-600 transition">
+              <span>Danh mục Permissions</span>
+              <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-pink-600 group-hover:translate-x-0.5 transition text-[10px]"></i>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Quản lý danh mục các API endpoint bảo vệ.</div>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+
+  
+</div>

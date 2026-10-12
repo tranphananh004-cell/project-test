@@ -1,0 +1,262 @@
+<div class="flex flex-col gap-6 w-full">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Quản Lý Vai Trò</h1>
+
+      </div>
+      <p class="text-xs text-slate-500">Định nghĩa các nhóm vai trò trong hệ thống và phân bổ quyền hạn cho từng nhóm.
+      </p>
+    </div>
+
+    @if (authService.hasPermission('ROLE_CREATE')) {
+    <button id="add-role-btn"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs transition shadow-sm cursor-pointer border border-purple-500/20"
+      (click)="openCreateModal()">
+      <i class="fa-solid fa-plus text-xs"></i> Thêm vai trò mới
+    </button>
+    }
+  </div>
+
+  <!-- Roles Grid -->
+  @if (loading) {
+  <div
+    class="p-16 text-center text-slate-500 flex flex-col items-center gap-3 text-sm rounded-3xl bg-white border border-slate-200 shadow-xs">
+    <i class="fa-solid fa-circle-notch animate-spin text-2xl text-purple-600"></i>
+    <span>Đang tải danh sách vai trò</span>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (role of roles; track role.id) {
+    <div
+      class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider"
+            [ngClass]="role.name === 'ADMIN' ? 'bg-pink-50 text-pink-700 border border-pink-200' : 'bg-purple-50 text-purple-700 border border-purple-200'">
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <span>{{ role.name }}</span>
+          </div>
+
+          <div class="flex items-center gap-1">
+            @if (authService.hasPermission('ROLE_ASSIGN_PERMISSION')) {
+            <button
+              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-purple-50 text-slate-600 hover:text-purple-600 transition flex items-center justify-center text-xs border border-slate-200 cursor-pointer"
+              (click)="openAssignPermissionModal(role)" title="Gán permissions">
+              <i class="fa-solid fa-key text-[11px]"></i>
+            </button>
+            }
+            @if (authService.hasPermission('ROLE_UPDATE')) {
+            <button
+              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-800 transition flex items-center justify-center text-xs border border-slate-200 cursor-pointer"
+              (click)="openEditModal(role)" title="Chỉnh sửa">
+              <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+            </button>
+            }
+            @if (authService.hasPermission('ROLE_DELETE')) {
+            <button
+              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition flex items-center justify-center text-xs disabled:opacity-20 disabled:pointer-events-none border border-slate-200 cursor-pointer"
+              (click)="openDeleteModal(role)" title="Xoá vai trò" [disabled]="role.isSystem || role.name === 'ADMIN'">
+              <i class="fa-solid fa-trash-can text-[11px]"></i>
+            </button>
+            }
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">{{ role.description || 'Chưa có mô tả cho nhóm quyền
+          này.' }}</p>
+      </div>
+
+      <div class="pt-3.5 border-t border-slate-100">
+        <div class="flex items-center justify-between text-xs text-slate-600 mb-2">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid text-purple-600 text-[10px]"></i>
+            <span>Quyền hạn được cấp</span>
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-1">
+          @for (p of (role.permissions || []).slice(0, 5); track p.id) {
+          <span
+            class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-mono">{{
+            p.name }}</span>
+          }
+          @if (role.permissions && role.permissions.length > 5) {
+          <span
+            class="text-[10px] px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-semibold border border-purple-200">+ {{
+            role.permissions.length - 5 }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Create/Edit Modal -->
+  @if (showFormModal) {
+  <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+    (click)="showFormModal = false">
+    <div class="w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-xl overflow-hidden"
+      (click)="$event.stopPropagation()">
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-shield"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-sm">{{ isEditMode ? 'Cập nhật Vai Trò' : 'Tạo mới Vai Trò' }}</h3>
+        </div>
+        <button class="text-slate-400 hover:text-slate-600 transition cursor-pointer" (click)="showFormModal = false"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5">
+        <form (ngSubmit)="saveRole()" class="flex flex-col gap-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider text-[11px]">Tên vai
+              trò *</label>
+            <input type="text"
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs focus:outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:opacity-40"
+              [(ngModel)]="formRole.name" name="name" required
+              [disabled]="isEditMode && (selectedRole?.isSystem || selectedRole?.name === 'ADMIN')"
+              placeholder="Nhập tên vai trò" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider text-[11px]">Mô tả
+              vai trò</label>
+            <textarea
+              class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 text-xs focus:outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+              rows="3" [(ngModel)]="formRole.description" name="description"
+              placeholder="Mô tả phạm vi quyền hạn"></textarea>
+          </div>
+
+          <div class="flex items-center justify-end gap-2.5 pt-3.5 border-t border-slate-100">
+            <button type="button"
+              class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition cursor-pointer"
+              (click)="showFormModal = false">Huỷ</button>
+            <button type="submit"
+              class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              [disabled]="submitting">
+              @if (submitting) { <i class="fa-solid fa-circle-notch animate-spin"></i> }
+              {{ isEditMode ? 'Lưu thay đổi' : 'Tạo vai trò' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Assign Permissions Modal -->
+  @if (showPermissionModal) {
+  <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+    (click)="showPermissionModal = false">
+    <div
+      class="w-full max-w-2xl max-h-[85vh] rounded-3xl bg-white border border-slate-200 shadow-xl overflow-hidden flex flex-col"
+      (click)="$event.stopPropagation()">
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-sm">
+            Phân quyền cho: <span
+              class="px-2.5 py-0.5 rounded-lg bg-purple-100 text-purple-700 font-mono font-bold text-xs">{{
+              selectedRole?.name }}</span>
+          </h3>
+        </div>
+        <button class="text-slate-400 hover:text-slate-600 transition cursor-pointer"
+          (click)="showPermissionModal = false"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-5 overflow-y-auto flex-1 flex flex-col gap-4">
+        <div
+          class="flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+          <span>Chọn các quyền hệ thống cấp phát:</span>
+          <div class="flex items-center gap-3">
+            <button type="button" class="text-purple-600 hover:text-purple-700 font-semibold cursor-pointer"
+              (click)="selectAllPerms()">Chọn tất cả</button>
+            <span class="text-slate-300">•</span>
+            <button type="button" class="text-slate-500 hover:text-slate-700 font-semibold cursor-pointer"
+              (click)="clearAllPerms()">Bỏ chọn hết</button>
+          </div>
+        </div>
+
+        <!-- Group permissions by resource -->
+        <div class="flex flex-col gap-3.5">
+          @for (resource of getResourceList(); track resource) {
+          <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-200/80">
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-folder-closed text-purple-600"></i> {{ resource.toUpperCase() }}
+              </span>
+              <span
+                class="text-[10px] px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200 font-medium">{{
+                getPermsByResource(resource).length }} quyền</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              @for (p of getPermsByResource(resource); track p.id) {
+              <label class="flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition"
+                [ngClass]="selectedPermIds.includes(p.id) ? 'bg-purple-50 border-purple-300 text-purple-900 shadow-xs' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
+                <input type="checkbox" class="mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-0"
+                  [checked]="selectedPermIds.includes(p.id)" (change)="togglePermSelect(p.id)" />
+                <div class="flex-1 min-w-0">
+                  <div class="font-mono font-semibold">{{ p.name }}</div>
+                  <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ p.description }}</div>
+                </div>
+              </label>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <button type="button"
+          class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition cursor-pointer"
+          (click)="showPermissionModal = false">Đóng</button>
+        <button type="button"
+          class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+          [disabled]="submitting" (click)="saveAssignedPermissions()">
+          @if (submitting) { <i class="fa-solid fa-circle-notch animate-spin"></i> }
+          Lưu {{ selectedPermIds.length }} quyền hạn
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Delete Modal -->
+  @if (showDeleteModal) {
+  <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+    (click)="showDeleteModal = false">
+    <div class="w-full max-w-sm rounded-3xl bg-white border border-slate-200 shadow-xl overflow-hidden"
+      (click)="$event.stopPropagation()">
+      <div class="p-4 sm:p-5 border-b border-rose-100 relative flex items-center justify-center bg-rose-50/50">
+        <h3 class="font-bold text-rose-600 text-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation"></i> Xác nhận xoá
+        </h3>
+        <button
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+          (click)="showDeleteModal = false"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 text-xs text-slate-600 text-center">
+        <p>Bạn có chắc muốn xoá vai trò <strong class="text-slate-800">{{ selectedRole?.name }}</strong>?</p>
+        <p class="text-slate-400 mt-1.5">Lưu ý: Không thể xoá vai trò nếu đang có người dùng thuộc vai trò này.</p>
+      </div>
+      <div class="p-3.5 bg-slate-50/60 border-t border-slate-100 flex items-center justify-center gap-2.5">
+        <button type="button"
+          class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition cursor-pointer"
+          (click)="showDeleteModal = false">Huỷ</button>
+        <button type="button"
+          class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+          [disabled]="submitting" (click)="confirmDelete()">
+          @if (submitting) { <i class="fa-solid fa-circle-notch animate-spin"></i> }
+          Xác nhận xoá
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

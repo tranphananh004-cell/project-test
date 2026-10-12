@@ -1,0 +1,33 @@
+<div class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none max-w-[400px] w-full" id="toast-container">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="pointer-events-auto flex items-start gap-3 p-4 rounded-2xl bg-white border border-slate-200/80 shadow-lg shadow-slate-200/50 transition-all duration-300 relative overflow-hidden"
+      [class.border-l-4]="true"
+      [class.border-l-emerald-500]="toast.type === 'success'"
+      [class.border-l-rose-500]="toast.type === 'error'"
+      [class.border-l-amber-500]="toast.type === 'warning'"
+      [class.border-l-sky-500]="toast.type === 'info'"
+      [id]="'toast-' + toast.id"
+    >
+      <div class="text-base leading-none mt-0.5">
+        @if (toast.type === 'success') { <i class="fa-solid fa-circle-check text-emerald-500"></i> }
+        @if (toast.type === 'error') { <i class="fa-solid fa-circle-exclamation text-rose-500"></i> }
+        @if (toast.type === 'warning') { <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> }
+        @if (toast.type === 'info') { <i class="fa-solid fa-circle-info text-sky-500"></i> }
+      </div>
+      <div class="flex-1 min-w-0">
+        @if (toast.title) {
+          <div class="font-bold text-xs tracking-tight text-slate-800 mb-0.5">{{ toast.title }}</div>
+        }
+        <div class="text-xs text-slate-600 break-words leading-relaxed">{{ toast.message }}</div>
+      </div>
+      <button
+        class="text-slate-400 hover:text-slate-600 transition p-1 text-xs leading-none cursor-pointer"
+        (click)="toastService.remove(toast.id)"
+        aria-label="Close"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+</div>

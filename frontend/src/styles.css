@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@source "./**/*.{html,ts}";
+@source "./index.html";
+
+/* ==========================================================================
+   NexusAuth Theme — Harmonious Light Pastel & Clean SaaS Style
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Clean Light & Harmonious Pastel */
+  --bg-canvas: #f8fafc;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --bg-surface: #e2e8f0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;
+
+  /* Primary Accent */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  /* Pastel Palette Tokens */
+  --pastel-blue-bg: #e0f2fe;
+  --pastel-blue-text: #0369a1;
+  --pastel-pink-bg: #fce7f3;
+  --pastel-pink-text: #be185d;
+  --pastel-purple-bg: #ede9fe;
+  --pastel-purple-text: #6d28d9;
+  --pastel-green-bg: #dcfce7;
+  --pastel-green-text: #15803d;
+  --pastel-amber-bg: #fef3c7;
+  --pastel-amber-text: #b45309;
+
+  /* Status Colors */
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+
+  /* Text Colors */
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-sub: #64748b;
+  --text-dim: #94a3b8;
+
+  /* Borders & Shadows */
+  --border-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-focus: #3b82f6;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --transition: all 0.15s ease-in-out;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html, body {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@layer components {
+  .pastel-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+  .pastel-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+}
