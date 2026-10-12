@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
     @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record ErrorResponse(
+            int code,
             int status,
             String error,
             String message,
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler {
     ) {
         public static ErrorResponse of(ErrorCode errorCode) {
             return ErrorResponse.builder()
+                    .code(errorCode.getCode())
                     .status(errorCode.getHttpStatus().value())
                     .error(errorCode.name())
                     .message(errorCode.getMessage())
@@ -44,6 +46,7 @@ public class GlobalExceptionHandler {
 
         public static ErrorResponse of(ErrorCode errorCode, String message) {
             return ErrorResponse.builder()
+                    .code(errorCode.getCode())
                     .status(errorCode.getHttpStatus().value())
                     .error(errorCode.name())
                     .message(message)
@@ -53,6 +56,7 @@ public class GlobalExceptionHandler {
 
         public static ErrorResponse of(ErrorCode errorCode, Map<String, String> fieldErrors) {
             return ErrorResponse.builder()
+                    .code(errorCode.getCode())
                     .status(errorCode.getHttpStatus().value())
                     .error(errorCode.name())
                     .message(errorCode.getMessage())
